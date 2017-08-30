@@ -5,26 +5,38 @@ var crystalGame = {
 	    numLosses: 0,
 
 
-	 // Function that "restarts" the game by resetting all of the variables and hangman page
+	// Generate random # between min and max values
+	randomIntFromInterval: function(min ,max) 
+	{
+	    return Math.floor(Math.random() * (max-  min + 1) + min);
+	},
+
+	// Function that "restarts" the game by 
+	// Generating new values for each crystal and target score, setting user score to 0
   	restartGame: function() {
 		this.userScore = 0;
-		this.targetScore = Math.floor((Math.random() * 120) + 1);
-
-		$("#crystal-1").attr("value", Math.floor((Math.random() * 12) + 1));
-		$("#crystal-2").attr("value", Math.floor((Math.random() * 12) + 1));
-		$("#crystal-3").attr("value", Math.floor((Math.random() * 12) + 1));
-		$("#crystal-4").attr("value", Math.floor((Math.random() * 12) + 1));	
-		$("#wins").attr("html", "Wins: " + this.numWins);
-		$("#losses").attr("html", "Losses: " + this.numLosses);
+		this.targetScore = this.randomIntFromInterval(19, 120);
+		
+		$("#user-score").html(this.userScore);
+		$("#target-score").html(this.targetScore);
+		$("#crystal-1").attr("value", this.randomIntFromInterval(1, 12));
+		$("#crystal-2").attr("value", this.randomIntFromInterval(1, 12));
+		$("#crystal-3").attr("value", this.randomIntFromInterval(1, 12));
+		$("#crystal-4").attr("value", this.randomIntFromInterval(1, 12));
+		$("#wins").html("Wins: " + this.numWins);
+		$("#losses").html("Losses: " + this.numLosses);
 
 		console.log("numWins:", this.numWins);
 		console.log("numLosses:", this.numLosses);
 	},
 
-  // Check if game was won
-  // Criteria: all letters in selected word match the letters entered
-  checkGameStatus: function(crystalVal) {
+  	// Check if game was won, lost or still playing 
+  	// Win: user score = target score
+  	// Lose: user score > target score 
+  	checkGameStatus: function(crystalVal) {
 	    this.userScore += Number(crystalVal);
+	    $("#user-score").html(this.userScore);
+
 	    console.log("crystalVal:", crystalVal);
 	    console.log("userScore:", this.userScore);
 	    console.log("targetScore:", this.targetScore);
@@ -38,20 +50,21 @@ var crystalGame = {
 	        this.numLosses += 1;	  
 	       	this.restartGame();
 	    }
-  },	
+  	},	
 };
 
 // Initialize when page loads
 crystalGame.restartGame();
 
+// When page is loaded
 $(document).ready(function() {
 
-
+	// Process mouse click on crystals
 	$(document).on("click", "img", function() {
 
 		console.log($(this).attr("value"));
 
- 		// Process user key press
+ 		// Check if game was won, lost or still in play
   		crystalGame.checkGameStatus($(this).attr("value"));  
 	});
 });
